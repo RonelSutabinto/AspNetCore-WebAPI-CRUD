@@ -96,21 +96,46 @@ namespace HPlusSport.API.Controllers
             return product;
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Product>> DeleteProduct(int id)
+        // Delete selected record using product id ==========
+
+        // [HttpDelete("{id}")]
+        // public async Task<ActionResult<Product>> DeleteProduct(int id)
+        // {
+        //     var product = await _context.Products.FindAsync(id);
+        //     if (product == null)
+        //     {
+        //         return NotFound();
+        //     }
+
+        //     _context.Products.Remove(product);
+        //     await _context.SaveChangesAsync();
+
+        //     return product;
+        // }
+    
+
+        // Multiple delete product records ========================
+        [HttpPost]
+        [Route("Delete")]
+        public async Task<ActionResult> DeleteMultiple([FromQuery]int[] ids)
         {
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
+            var products = new List<Product>();
+            foreach (var id in ids)
             {
-                return NotFound();
+                var product = await _context.Products.FindAsync(id);
+
+                if (product == null)
+                {
+                    return NotFound();
+                }
+
+                products.Add(product);
             }
 
-            _context.Products.Remove(product);
+            _context.Products.RemoveRange(products);
             await _context.SaveChangesAsync();
 
-            return product;
+            return Ok(products);
         }
-    
-        
     }
 }
